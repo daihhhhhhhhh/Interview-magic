@@ -1,0 +1,11 @@
+1、底层实现不一样，synchronized它是java语言的关键字，是原生语法层面的互斥，需要jvm实现。而ReentrantLock它是JDK 1.5之后提供的API层面的互斥锁，需要lock()和unlock()方法配合try/finally语句块来完成。也就是说synchronized隐式获得释放锁，ReentrantLock 显示的获得、释放锁。
+
+2、synchronized在发生异常时，会自动释放线程占有的锁，因此不会导致死锁现象发生；而Lock 在发生异常时，如果没有主动通过unLock()去释放锁，则很可能造成死锁现象，因此使用Lock 时需要在 finally块中释放锁。
+
+3、synchronized是同步阻塞，使用的是悲观并发策略，lock是同步非阻塞，采用的是乐观并发策略。
+
+4、ReentrantLock可以让等待锁的线程响应中断，而synchronized却不行，使用synchronized时，等待的线程会一直等待下去，不能够响应中断。通过ReentrantLock可以知道有没有成功获取锁，而synchronized却无法办到。最重要的是ReentrantLock可以提供公平锁，而synchronized只能是非公平锁。
+
+5、ReentrantLock可以提高多个线程进行读操作的效率，实现读写锁。
+
+6、ReentrantLock通过Condition可以绑定多个条件。
