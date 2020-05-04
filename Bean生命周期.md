@@ -18,3 +18,36 @@
 
 10、最后，如果这个Bean的Spring配置中配置了destroy-method属性，会自动调用其配置的销毁方法。
 
+
+
+![img](https://img2018.cnblogs.com/blog/1329146/201904/1329146-20190416211636679-1788097403.png)
+
+
+
+1.spring 的生命周期粗粒度的可以分为4个阶段
+
+   第一阶段：实例化（Instantiation）
+
+           //实例化是指Bean 从Bean到Object  
+           Object wrappedBean = applyBeanPostProcessorsBeforeInitialization(wrappedBean, beanName);
+
+第二阶段： 属性赋值
+
+ 
+
+ 第三阶段：初始化(Initialization)
+
+          初始化前： org.springFrameWork.beans.factory.config.BeanPostProcessor#postProcessBeforeInitialization
+    
+          初始化中         org.springFrameWork.bean.InitializingBean#afterPropertiesSet
+    
+          初始化后org.springFrameWork.beans.factory.config.BeanPostProcessor#postProcessAfterInitialization
+
+  
+
+
+第四阶段：销毁
+
+                     org.springFrameWork.bean.factory.DisposableBean#destory
+
+备注：.spring的核心就是Bean,Bean的生命周期是通过spring-context（上下文）控制的，而spring-context又基于spring-core进行的,只有Bean进行初始化后被IOC容器所管理，我们才可以在我们的应用中调用任意已经初始化的Bean.
