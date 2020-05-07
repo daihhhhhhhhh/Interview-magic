@@ -110,17 +110,27 @@ RESP 是redis客户端和服务端之前使用的一种通讯协议；
 
 RESP 的特点：实现简单、快速解析、可读性好
 
+Redis用不同的回复类型回复命令。它可能从服务器发送的第一个字节开始校验回复类型：
+
+（1）用单行回复，回复的第一个字节将是“+”
+
 For Simple Strings the first byte of the reply is "+" 回复
+
+（2）错误消息，回复的第一个字节将是“-”
 
 For Errors the first byte of the reply is "-" 错误
 
+（3）整型数字，回复的第一个字节将是“:”
+
 For Integers the first byte of the reply is ":" 整数
+
+（4）批量回复，回复的第一个字节将是“$”
 
 For Bulk Strings the first byte of the reply is "$" 字符串
 
-For Arrays the first byte of the reply is "*" 数组
+（5）多个批量回复，回复的第一个字节将是“*”
 
- 
+For Arrays the first byte of the reply is "*" 数组
 
 **Redis 有哪些架构模式？讲讲各自的特点**
 
