@@ -22,9 +22,7 @@ mysql实例在系统上的表现就是一个进程；
 
 InnoDB存储架构
 
- 
 
-![img]()
 
 ![img](https://images2015.cnblogs.com/blog/820365/201607/820365-20160720201614154-1247891255.png)
 
@@ -37,8 +35,6 @@ innodb 在内存中的缓存池 buffer pool ；
  
 
 **innodb相关的磁盘文件**
-
-![img]()
 
 ![img](https://images2015.cnblogs.com/blog/820365/201607/820365-20160720201627122-2053526887.png)
 
@@ -81,8 +77,6 @@ innodb_autoextend_increment：  系统表空间文件每次扩展的大小
 innodb_log_file_size：          ib_logfile文件大小（写操作多时可以增大）
 
 innodb_log_files_in_group：     有几个ib_logfile文件（写操作多时可以增大 ）
-
-![img]()
 
 **innodb_file_per_table：**  
 
