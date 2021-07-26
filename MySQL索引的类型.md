@@ -15,11 +15,17 @@ full textl: 表示 全文搜索的索引。 FULLTEXT 用于搜索很长一篇文
 为了使索引的使用效率更高，在创建索引时，必须考虑在哪些字段上创建索引和创建什么类型的索引,有7大原则：
 
 1．选择唯一性索引
+
 2．为经常需要排序、分组和联合操作的字段建立索引
+
 3．为常作为查询条件的字段建立索引
+
 4．限制索引的数目
+
 5．尽量使用数据量少的索引
+
 6．尽量使用前缀来索引
+
 7．删除不再使用或者很少使用的索引
 
  
@@ -80,28 +86,45 @@ mysql 索引分类
 
 在数据库表中，对字段建立索引可以大大提高查询速度。通过善用这些索引，可以令 MySQL的查询和运行更加高效。索引是快速搜索的关键。MySQL索引的建立对于MySQL的高效运行是很重要的。下面介绍几种常见的MySQL索引类型。 
 1、普通型索引 
+
 这是最基本的索引类型，而且它没有唯一性之类的限制。普通索引可以通过以下几种方式创建： 
+
 （1）创建索引，例如CREATE INDEX 索引的名字 ON tablename (列名1，列名2,...); 
+
 （2）修改表，例如ALTER TABLE tablename ADD INDEX 索引的名字 (列名1，列名2,...); 
-（3）创建表的时候指定索引，例如CREATE TABLE tablename ( [...], INDEX 索引的名字 (列名1，列名 
-2,...) ); 
+
+（3）创建表的时候指定索引，例如CREATE TABLE tablename ( [...], INDEX 索引的名字 (列名1，列名2,...) ); 
+
 2、唯一索引 
+
 这种索引和前面的“普通索引”基本相同，但有一个区别：索引列的所有值都只能出现一次，即必须唯一。唯一性索引可以用以下几种方式创建： 
+
 （1）创建索引，例如CREATE UNIQUE INDEX 索引的名字 ON tablename (列的列表); 
+
 （2）修改表，例如ALTER TABLE tablename ADD UNIQUE 索引的名字 (列的列表); 
-（3）创建表的时候指定索引，例如CREATE TABLE tablename ( [...], UNIQUE 索引的名字 (列的列 
-表) ); 
+
+（3）创建表的时候指定索引，例如CREATE TABLE tablename ( [...], UNIQUE 索引的名字 (列的列表) ); 
+
 3、主键 
+
 主键是一种唯一性索引，但它必须指定为“PRIMARY KEY”。如果你曾经用过AUTO_INCREMENT类型的列，你可能已经熟悉主键之类的概念了。主键一般在创建表的时候指定，例如“CREATE TABLE tablename ( [...], PRIMARY KEY (列的列表) ); ”。但是，我们也可以通过修改表的方式加入主键，例如“ALTER TABLE tablename ADD PRIMARY KEY (列的列表); ”。每个表只能有一个主键。 （主键相当于聚合索引，是查找最快的索引） 
+
 4、单列索引和多列索引 
+
 索引可以是单列索引，也可以是多列索引。 
+
 （1）单列索引就是常用的一个列字段的索引，常见的索引。 
+
 （2）多列索引就是含有多个列字段的索引 
+
 alter table student add index sy(name,age，score); 
+
 索引sy就为多列索引，多列索引在以下几中情况下才能有效： 
-select * from student where name='jia' and age>='12' //where条件中含有索引的首列字段和 
-第二个字段 
+
+select * from student where name='jia' and age>='12' //where条件中含有索引的首列字段和第二个字段 
+
 select * from student where name='jia' //where条件中只含有首列字段 
-select * from student where name='jia' and score<60//where条件中含有首列字段和第三个字 
-段 
+
+select * from student where name='jia' and score<60//where条件中含有首列字段和第三个字段 
+
 总结：多列索引只有在where条件中含有索引中的首列字段时才有效 
