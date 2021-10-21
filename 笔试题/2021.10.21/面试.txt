@@ -1,0 +1,162 @@
+public Set<Node> getNode(Node[] nodes){
+    Set<Node> set = new HashSet<>();
+    Set<Node> res = new HashSet<>();
+    for(Node node : nodes){
+        if(node.next != null && !set.contains(node.next)){
+            set.add(node.next);
+        }
+    }
+    for(Node node : nodes){
+        if(!set.contains(node)){
+            res.add(node);
+        }
+    }
+    return res;
+}
+
+
+
+
+
+
+
+
+
+
+------------------------------------------------------------------------------------------------
+2、
+
+public static int pop(ArrayDeque<Integer> stack){
+    if(testAndSet(stack.getFirst(), )){
+    
+    }
+
+}
+
+public static void push(ArrayDeque<Integer> stack){
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+------------------------------------------------------------------------------------------------
+3、
+public double m(int int[][] item){
+    int[][] dp = new int[7][2];
+    //dp[i][j] --> 当面对第i件奖品，抽到该件物品的概率
+    for(){
+    
+    
+    }
+
+
+
+
+
+
+}
+
+-------------------------------------------------------------------------------------------------
+4、
+public int[] getMax(int[] arr){
+    if(arr == null || arr.length == 0){
+        return null;
+    }
+    int left = 0;
+    int right = arr.length - 1;
+    int max = 0;
+    int index = 0;
+    while(left < right ){
+        int mid = right + ((right - left) >> 1);
+        if(arr[mid] < arr[mid + 1]){
+            left = mid + 1;
+            if(max < arr[mid + 1]){
+                max = arr[mid + 1];
+                index = mid + 1;
+            }
+        }else if(arr[mid] < arr[mid - 1]){
+            right = mid - 1;
+            if(max < arr[mid - 1]){
+                max = arr[mid - 1];
+                index = mid - 1;
+            }
+        }else{
+            max = arr[mid];
+            index = mid;
+        }
+    }
+    int leftbound = index - 1;
+    int rightbound = index + 1;
+    while(leftbound > 0 && arr[leftbound] == arr[index]){
+        leftbound --;
+    }
+    
+    while(rightbound < arr.length && arr[rightbound] == arr[index]){
+        rightbound ++;
+    }
+    return new int[]{max, rightbound - leftbound + 1};
+
+
+}
+
+------------------------------------------------------------------------------------------------
+5、
+public class Category{
+    private String id;
+    private String parent_id;
+    private String name;
+    private List<Category> child;
+//getter and setter
+}
+public Category getTree(Category[] arr){
+    //Set<String> parentIdSet = new HashSet<>();
+    Category root = null;
+    for(Category category : arr){
+        if(category.getParent_id() == null){
+            root = category;
+        }
+    }
+    recursion(root, arr);
+    return root;
+}
+public void recursion(Category root, Category[] arr){
+    for(Category category : arr){
+        if(root.getId().equals(category.getParent_id())){
+            if(root.getChild == null){
+                root.setChild(new ArrayList<>());
+                root.getChild().add(category);
+            }else{
+                root.getChild().add(category);
+            }
+        }
+        for(Category category : root.getChild){
+            recursion(category, arr);
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
