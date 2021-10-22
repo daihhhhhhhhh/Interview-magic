@@ -7,7 +7,15 @@
 　　**SDS 定义：**
 
 ```
-`struct` `sdshdr{``   ``//记录buf数组中已使用字节的数量``   ``//等于 SDS 保存字符串的长度``   ``int` `len;``   ``//记录 buf 数组中未使用字节的数量``   ``int` `free``;``   ``//字节数组，用于保存字符串``   ``char` `buf[];``}`
+`struct` `sdshdr{``   
+    ``//记录buf数组中已使用字节的数量``   
+    ``//等于 SDS 保存字符串的长度``   
+    ``int` `len;``   
+    ``//记录 buf 数组中未使用字节的数量``   
+    ``int` `free``;``   
+    ``//字节数组，用于保存字符串``   
+    ``char` `buf[];``
+}`
 ```
 
 　　用SDS保存字符串 “Redis”具体图示如下：
@@ -65,13 +73,33 @@
 　　链表定义：
 
 ```
-`typedef` `struct` `listNode{``    ``//前置节点``    ``struct` `listNode *prev;``    ``//后置节点``    ``struct` `listNode *next;``    ``//节点的值``    ``void` `*value; ``}listNode`
+`typedef` `struct` `listNode{``    
+    ``//前置节点``    
+    ``struct` `listNode *prev;``    
+    ``//后置节点``    
+    ``struct` `listNode *next;``    
+    ``//节点的值``    
+    ``void` `*value; ``
+}listNode`
 ```
 
 　　通过多个 listNode 结构就可以组成链表，这是一个双向链表，Redis还提供了操作链表的数据结构：
 
 ```
-`typedef` `struct` `list{``   ``//表头节点``   ``listNode *head;``   ``//表尾节点``   ``listNode *tail;``   ``//链表所包含的节点数量``   ``unsigned ``long` `len;``   ``//节点值复制函数``   ``void` `(*``free``) (``void` `*ptr);``   ``//节点值释放函数``   ``void` `(*``free``) (``void` `*ptr);``   ``//节点值对比函数``   ``int` `(*match) (``void` `*ptr,``void` `*key);``}list;`
+`typedef` `struct` `list{``   
+    ``//表头节点``   
+    ``listNode *head;``   
+    ``//表尾节点``   
+    ``listNode *tail;``   
+    ``//链表所包含的节点数量``   
+    ``unsigned ``long` `len;``   
+    ``//节点值复制函数``   
+    ``void` `(*``free``) (``void` `*ptr);``   
+    ``//节点值释放函数``   
+    ``void` `(*``free``) (``void` `*ptr);``   
+    ``//节点值对比函数``   
+    ``int` `(*match) (``void` `*ptr,``void` `*key);``
+}list;`
 ```
 
 　　![img](https://images2018.cnblogs.com/blog/1120165/201805/1120165-20180528074403440-111834793.png)
@@ -95,13 +123,35 @@
 　　哈希表结构定义：
 
 ```
-`typedef` `struct` `dictht{``   ``//哈希表数组``   ``dictEntry **table;``   ``//哈希表大小``   ``unsigned ``long` `size;``   ``//哈希表大小掩码，用于计算索引值``   ``//总是等于 size-1``   ``unsigned ``long` `sizemask;``   ``//该哈希表已有节点的数量``   ``unsigned ``long` `used;` `}dictht`
+`typedef` `struct` `dictht{``   
+    ``//哈希表数组``   
+    ``dictEntry **table;``   
+    ``//哈希表大小``   
+    ``unsigned ``long` `size;``   
+    ``//哈希表大小掩码，用于计算索引值``   
+    ``//总是等于 size-1``   
+    ``unsigned ``long` `sizemask;``   
+    ``//该哈希表已有节点的数量``   
+    ``unsigned ``long` `used;` `
+}dictht`
 ```
 
 　　哈希表是由数组 table 组成，table 中每个元素都是指向 dict.h/dictEntry 结构，dictEntry 结构定义如下：
 
 ```
-`typedef` `struct` `dictEntry{``   ``//键``   ``void` `*key;``   ``//值``   ``union``{``     ``void` `*val;``     ``uint64_tu64;``     ``int64_ts64;``   ``}v;` `   ``//指向下一个哈希表节点，形成链表``   ``struct` `dictEntry *next;``}dictEntry`
+`typedef` `struct` `dictEntry{``   
+    ``//键``   
+    ``void` `*key;``   
+    ``//值``   
+    ``union``
+        {``     
+        ``void` `*val;``     
+        ``uint64_tu64;``     
+        ``int64_ts64;``   ``
+        }v;` `   
+    ``//指向下一个哈希表节点，形成链表``   
+    ``struct` `dictEntry *next;``
+}dictEntry`
 ```
 
 　　key 用来保存键，val 属性用来保存值，值可以是一个指针，也可以是uint64_t整数，也可以是int64_t整数。
@@ -159,13 +209,34 @@
 　　Redis中跳跃表节点定义如下：
 
 ```
-`typedef` `struct` `zskiplistNode {``   ``//层``   ``struct` `zskiplistLevel{``      ``//前进指针``      ``struct` `zskiplistNode *forward;``      ``//跨度``      ``unsigned ``int` `span;``   ``}level[];` `   ``//后退指针``   ``struct` `zskiplistNode *backward;``   ``//分值``   ``double` `score;``   ``//成员对象``   ``robj *obj;` `} zskiplistNode`
+`typedef` `struct` `zskiplistNode {``   
+    ``//层``   
+    ``struct` `zskiplistLevel{``      
+        ``//前进指针``      
+        ``struct` `zskiplistNode *forward;``      
+        ``//跨度``      
+        ``unsigned ``int` `span;``   ``
+        }level[];` `   
+    ``//后退指针``   
+    ``struct` `zskiplistNode *backward;``   
+    ``//分值``   
+    ``double` `score;``   
+    ``//成员对象``   
+    ``robj *obj;` `
+} zskiplistNode`
 ```
 
 　　多个跳跃表节点构成一个跳跃表：
 
 ```
-`typedef` `struct` `zskiplist{``   ``//表头节点和表尾节点``   ``structz skiplistNode *header, *tail;``   ``//表中节点的数量``   ``unsigned ``long` `length;``   ``//表中层数最大的节点的层数``   ``int` `level;` `}zskiplist;`
+`typedef` `struct` `zskiplist{``   
+    ``//表头节点和表尾节点``   
+    ``structz skiplistNode *header, *tail;``   
+    ``//表中节点的数量``   
+    ``unsigned ``long` `length;``   
+    ``//表中层数最大的节点的层数``   
+    ``int` `level;` `
+}zskiplist;`
 ```
 
 　　![img](https://images2018.cnblogs.com/blog/1120165/201805/1120165-20180528211740486-225860439.png)
@@ -183,7 +254,14 @@
 　　定义如下：
 
 ```
-`typedef` `struct` `intset{``   ``//编码方式``   ``uint32_t encoding;``   ``//集合包含的元素数量``   ``uint32_t length;``   ``//保存元素的数组``   ``int8_t contents[];` `}intset;`
+`typedef` `struct` `intset{``   
+    ``//编码方式``   
+    ``uint32_t encoding;``   
+    ``//集合包含的元素数量``   
+    ``uint32_t length;``   
+    ``//保存元素的数组``   
+    ``int8_t contents[];` `
+}intset;`
 ```
 
 　　整数集合的每个元素都是 contents 数组的一个数据项，它们按照从小到大的顺序排列，并且不包含任何重复项。
