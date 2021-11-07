@@ -1,16 +1,18 @@
-1. Java 内存区域与内存溢出异常
-1.1 运行时数据区域
+## 1 Java 内存区域与内存溢出异常
+
+### 1.1 运行时数据区域
+
 根据《Java 虚拟机规范(Java SE 7 版)》规定，Java 虚拟机所管理的内存如下图所示。
 
 ![img](https://imgconvert.csdnimg.cn/aHR0cHM6Ly91c2VyLWdvbGQtY2RuLnhpdHUuaW8vMjAxNy85LzQvZGQzYjE1YjNkODgyNmZhZWFlMjA2Mzk3NmZiOTkyMTM_aW1hZ2VWaWV3Mi8wL3cvMTI4MC9oLzk2MC9mb3JtYXQvd2VicC9pZ25vcmUtZXJyb3IvMQ)
 
- 1.1.1 程序计数器
+####  1.1.1 程序计数器
 
 内存空间小，线程私有。字节码解释器工作是就是通过改变这个计数器的值来选取下一条需要执行指令的字节码指令，分支、循环、跳转、异常处理、线程恢复等基础功能都需要依赖计数器完成
 
 如果线程正在执行一个 Java 方法，这个计数器记录的是正在执行的虚拟机字节码指令的地址；如果正在执行的是 Native 方法，这个计数器的值则为 (Undefined)。此内存区域是唯一一个在 Java 虚拟机规范中没有规定任何 OutOfMemoryError 情况的区域。
 
-1.1.2 Java 虚拟机栈
+#### 1.1.2 Java 虚拟机栈
 
 线程私有，生命周期和线程一致。描述的是 Java 方法执行的内存模型：每个方法在执行时都会床创建一个栈帧(Stack Frame)用于存储局部变量表、操作数栈、动态链接、方法出口等信息。每一个方法从调用直至执行结束，就对应着一个栈帧从虚拟机栈中入栈到出栈的过程。
 
@@ -19,17 +21,17 @@
 StackOverflowError：线程请求的栈深度大于虚拟机所允许的深度。
 OutOfMemoryError：如果虚拟机栈可以动态扩展，而扩展时无法申请到足够的内存。
 
-1.1.3 本地方法栈
+#### 1.1.3 本地方法栈
 
 区别于 Java 虚拟机栈的是，Java 虚拟机栈为虚拟机执行 Java 方法(也就是字节码)服务，而本地方法栈则为虚拟机使用到的 Native 方法服务。也会有 StackOverflowError 和 OutOfMemoryError 异常。
 
-1.1.4 Java 堆
+#### 1.1.4 Java 堆
 
 对于绝大多数应用来说，这块区域是 JVM 所管理的内存中最大的一块。线程共享，主要是存放对象实例和数组。内部会划分出多个线程私有的分配缓冲区(Thread Local Allocation Buffer, TLAB)。可以位于物理上不连续的空间，但是逻辑上要连续。
 
 OutOfMemoryError：如果堆中没有内存完成实例分配，并且堆也无法再扩展时，抛出该异常。
 
-1.1.5 方法区
+#### 1.1.5 方法区
 
 属于共享内存区域，存储已被虚拟机加载的类信息、常量、静态变量、即时编译器编译后的代码等数据。
 
@@ -37,21 +39,22 @@ OutOfMemoryError：如果堆中没有内存完成实例分配，并且堆也无�
 
 ![img](https://imgconvert.csdnimg.cn/aHR0cHM6Ly91c2VyLWdvbGQtY2RuLnhpdHUuaW8vMjAxNy85LzQvZGE3N2Q5MDE0Njc4NmMwY2IzZTE3MGI5YzkzNzZhZTQ_aW1hZ2VWaWV3Mi8wL3cvMTI4MC9oLzk2MC9mb3JtYXQvd2VicC9pZ25vcmUtZXJyb3IvMQ)
 
- 1.1.6 运行时常量池
+####  1.1.6 运行时常量池
 
 属于方法区一部分，用于存放编译期生成的各种字面量和符号引用。编译器和运行期(String 的 intern() )都可以将常量放入池中。内存有限，无法申请时抛出 OutOfMemoryError。
 
-1.1.7 直接内存
+#### 1.1.7 直接内存
 
 非虚拟机运行时数据区的部分
 
 在 JDK 1.4 中新加入 NIO (New Input/Output) 类，引入了一种基于通道(Channel)和缓存(Buffer)的 I/O 方式，它可以使用 Native 函数库直接分配堆外内存，然后通过一个存储在 Java 堆中的 DirectByteBuffer 对象作为这块内存的引用进行操作。可以避免在 Java 堆和 Native 堆中来回的数据耗时操作。
 OutOfMemoryError：会受到本机内存限制，如果内存区域总和大于物理内存限制从而导致动态扩展时出现该异常。
 
-1.2 HotSpot 虚拟机对象探秘
+### 1.2 HotSpot 虚拟机对象探秘
+
 主要介绍数据是如何创建、如何布局以及如何访问的。
 
-1.2.1 对象的创建
+#### 1.2.1 对象的创建
 
 创建过程比较复杂，建议看书了解，这里提供个人的总结。
 
@@ -65,7 +68,7 @@ OutOfMemoryError：会受到本机内存限制，如果内存区域总和大于�
 
 执行 new 指令后执行 init 方法后才算一份真正可用的对象创建完成。
 
-1.2.2 对象的内存布局
+#### 1.2.2 对象的内存布局
 
 在 HotSpot 虚拟机中，分为 3 块区域：对象头(Header)、实例数据(Instance Data)和对齐填充(Padding)
 
@@ -75,7 +78,7 @@ OutOfMemoryError：会受到本机内存限制，如果内存区域总和大于�
 
 对齐填充(Padding)：不是必然需要，主要是占位，保证对象大小是某个字节的整数倍。
 
-1.2.3 对象的访问定位
+#### 1.2.3 对象的访问定位
 
 使用对象时，通过栈上的 reference 数据来操作堆上的具体对象。
 
@@ -93,17 +96,21 @@ reference 中直接存储对象地址
 
  比较：使用句柄的最大好处是 reference 中存储的是稳定的句柄地址，在对象移动(GC)是只改变实例数据指针地址，reference 自身不需要修改。直接指针访问的最大好处是速度快，节省了一次指针定位的时间开销。如果是对象频繁 GC 那么句柄方法好，如果是对象频繁访问则直接指针访问好。
 
-1.3 实战
+## 1.3 实战
+
 // 待填
 
-2. 垃圾回收器与内存分配策略
-2.1 概述
+# 2 垃圾回收器与内存分配策略
+
+### 2.1 概述
+
 程序计数器、虚拟机栈、本地方法栈 3 个区域随线程生灭(因为是线程私有)，栈中的栈帧随着方法的进入和退出而有条不紊地执行着出栈和入栈操作。而 Java 堆和方法区则不一样，一个接口中的多个实现类需要的内存可能不一样，一个方法中的多个分支需要的内存也可能不一样，我们只有在程序处于运行期才知道那些对象会创建，这部分内存的分配和回收都是动态的，垃圾回收期所关注的就是这部分内存。
 
-2.2 对象已死吗？
+### 2.2 对象已死吗？
+
 在进行内存回收之前要做的事情就是判断那些对象是‘死’的，哪些是‘活’的。
 
-2.2.1 引用计数法
+#### 2.2.1 引用计数法
 
 给对象添加一个引用计数器。但是难以解决循环引用问题。
 
@@ -111,7 +118,7 @@ reference 中直接存储对象地址
 
  从图中可以看出，如果不下小心直接把 Obj1-reference 和 Obj2-reference 置 null。则在 Java 堆当中的两块内存依然保持着互相引用无法回收。
 
-2.2.2 可达性分析法
+#### 2.2.2 可达性分析法
 
 通过一系列的 ‘GC Roots’ 的对象作为起始点，从这些节点出发所走过的路径称为引用链。当一个对象到 GC Roots 没有任何引用链相连的时候说明对象不可用。
 
@@ -123,7 +130,8 @@ reference 中直接存储对象地址
 方法区中类静态属性引用的对象
 方法区中常量引用的对象
 本地方法栈中 JNI(即一般说的 Native 方法) 引用的对象
-2.2.3 再谈引用
+
+#### 2.2.3 再谈引用
 
 前面的两种方式判断存活时都与‘引用’有关。但是 JDK 1.2 之后，引用概念进行了扩充，下面具体介绍。
 
@@ -145,7 +153,7 @@ WeakReference 类实现弱引用。对象只能生存到下一次垃圾收集之
 
 PhantomReference 类实现虚引用。无法通过虚引用获取一个对象的实例，为一个对象设置虚引用关联的唯一目的就是能在这个对象被收集器回收时收到一个系统通知。
 
-2.2.4 生存还是死亡
+#### 2.2.4 生存还是死亡
 
 即使在可达性分析算法中不可达的对象，也并非是“facebook”的，这时候它们暂时出于“缓刑”阶段，一个对象的真正死亡至少要经历两次标记过程：如果对象在进行中可达性分析后发现没有与 GC Roots 相连接的引用链，那他将会被第一次标记并且进行一次筛选，筛选条件是此对象是否有必要执行 finalize() 方法。当对象没有覆盖 finalize() 方法，或者 finalize() 方法已经被虚拟机调用过，虚拟机将这两种情况都视为“没有必要执行”。
 
@@ -153,7 +161,7 @@ PhantomReference 类实现虚引用。无法通过虚引用获取一个对象的
 
 finalize() 方法只会被系统自动调用一次。
 
-2.2.5 回收方法区
+#### 2.2.5 回收方法区
 
 在堆中，尤其是在新生代中，一次垃圾回收一般可以回收 70% ~ 95% 的空间，而永久代的垃圾收集效率远低于此。
 
@@ -166,10 +174,12 @@ finalize() 方法只会被系统自动调用一次。
 该类所有的实例都已经回收，也就是 Java 堆中不存在该类的任何实例
 加载该类的 ClassLoader 已经被回收
 该类对应的 java.lang.Class 对象没有任何地方呗引用，无法在任何地方通过反射访问该类的方法
-2.3 垃圾回收算法
+
+#### 2.3 垃圾回收算法
+
 仅提供思路
 
-2.3.1 标记 —— 清除算法
+#### 2.3.1 标记 —— 清除算法
 
 直接标记清除就可。
 
@@ -177,17 +187,18 @@ finalize() 方法只会被系统自动调用一次。
 
 效率不高
 空间会产生大量碎片
-2.3.2 复制算法
+
+#### 2.3.2 复制算法
 
 把空间分成两块，每次只对其中一块进行 GC。当这块内存使用完时，就将还存活的对象复制到另一块上面。
 
 解决前一种方法的不足，但是会造成空间利用率低下。因为大多数新生代对象都不会熬过第一次 GC。所以没必要 1 : 1 划分空间。可以分一块较大的 Eden 空间和两块较小的 Survivor 空间，每次使用 Eden 空间和其中一块 Survivor。当回收时，将 Eden 和 Survivor 中还存活的对象一次性复制到另一块 Survivor 上，最后清理 Eden 和 Survivor 空间。大小比例一般是 8 : 1 : 1，每次浪费 10% 的 Survivor 空间。但是这里有一个问题就是如果存活的大于 10% 怎么办？这里采用一种分配担保策略：多出来的对象直接进入老年代。
 
-2.3.3 标记-整理算法
+#### 2.3.3 标记-整理算法
 
 不同于针对新生代的复制算法，针对老年代的特点，创建该算法。主要是把存活对象移到内存的一端。
 
-2.3.4 分代回收
+#### 2.3.4 分代回收
 
 根据存活对象划分几块内存区，一般是分为新生代和老年代。然后根据各个年代的特点制定相应的回收算法。
 
@@ -199,10 +210,12 @@ finalize() 方法只会被系统自动调用一次。
 
 老年代中对象存活率较高、没有额外的空间分配对它进行担保。所以必须使用 标记 —— 清除 或者 标记 —— 整理 算法回收。
 
-2.4 HotSpot 的算法实现
+### 2.4 HotSpot 的算法实现
+
 // 待填
 
-2.5 垃圾回收器
+### 2.5 垃圾回收器
+
 收集算法是内存回收的理论，而垃圾回收器是内存回收的实践。
 
 ![img](https://imgconvert.csdnimg.cn/aHR0cHM6Ly91c2VyLWdvbGQtY2RuLnhpdHUuaW8vMjAxNy85LzQvMTVmYjc1NDc2MmZmNWRmM2Y3ZjYzZTVjMjZkNGQzYWU_aW1hZ2VWaWV3Mi8wL3cvMTI4MC9oLzk2MC9mb3JtYXQvd2VicC9pZ25vcmUtZXJyb3IvMQ)
@@ -211,13 +224,13 @@ finalize() 方法只会被系统自动调用一次。
 
 说明：如果两个收集器之间存在连线说明他们之间可以搭配使用。
 
-2.5.1 Serial 收集器
+#### 2.5.1 Serial 收集器
 
 这是一个单线程收集器。意味着它只会使用一个 CPU 或一条收集线程去完成收集工作，并且在进行垃圾回收时必须暂停其它所有的工作线程直到收集结束。
 
 ![img](https://imgconvert.csdnimg.cn/aHR0cHM6Ly91c2VyLWdvbGQtY2RuLnhpdHUuaW8vMjAxNy85LzQvYjE4NDk0YjFlNTQ4NTFiYmJkMmVlNTI3NjBjYzM3NTQ_aW1hZ2VWaWV3Mi8wL3cvMTI4MC9oLzk2MC9mb3JtYXQvd2VicC9pZ25vcmUtZXJyb3IvMQ)
 
- 2.5.2 ParNew 收集器
+####  2.5.2 ParNew 收集器
 
 可以认为是 Serial 收集器的多线程版本。
 
@@ -233,7 +246,7 @@ finalize() 方法只会被系统自动调用一次。
 
 指用户线程和垃圾回收线程同时执行(不一定是并行，有可能是交叉执行)，用户进程在运行，而垃圾回收线程在另一个 CPU 上运行。
 
-2.5.3 Parallel Scavenge 收集器
+#### 2.5.3 Parallel Scavenge 收集器
 
 这是一个新生代收集器，也是使用复制算法实现，同时也是并行的多线程收集器。
 
@@ -241,7 +254,7 @@ finalize() 方法只会被系统自动调用一次。
 
 作为一个吞吐量优先的收集器，虚拟机会根据当前系统的运行情况收集性能监控信息，动态调整停顿时间。这就是 GC 的自适应调整策略(GC Ergonomics)。
 
-2.5.4 Serial Old 收集器
+#### 2.5.4 Serial Old 收集器
 
 收集器的老年代版本，单线程，使用 标记 —— 整理。
 
@@ -249,13 +262,13 @@ finalize() 方法只会被系统自动调用一次。
 
  
 
-2.5.5 Parallel Old 收集器
+#### 2.5.5 Parallel Old 收集器
 
 Parallel Old 是 Parallel Scavenge 收集器的老年代版本。多线程，使用 标记 —— 整理
 
  ![img](https://imgconvert.csdnimg.cn/aHR0cHM6Ly91c2VyLWdvbGQtY2RuLnhpdHUuaW8vMjAxNy85LzQvMjU2NDEzNjZiNDNkOTcxMzEwYTBhN2NlZGU0ZTQwNmE_aW1hZ2VWaWV3Mi8wL3cvMTI4MC9oLzk2MC9mb3JtYXQvd2VicC9pZ25vcmUtZXJyb3IvMQ)
 
-2.5.6 CMS 收集器
+#### 2.5.6 CMS 收集器
 
 CMS (Concurrent Mark Sweep) 收集器是一种以获取最短回收停顿时间为目标的收集器。基于 标记 —— 清除 算法实现。
 
@@ -271,7 +284,7 @@ CMS (Concurrent Mark Sweep) 收集器是一种以获取最短回收停顿时间�
 
 缺点：对 CPU 资源敏感、无法收集浮动垃圾、标记 —— 清除 算法带来的空间碎片
 
-2.5.7 G1 收集器
+#### 2.5.7 G1 收集器
 
 面向服务端的垃圾回收器。
 
@@ -286,9 +299,9 @@ CMS (Concurrent Mark Sweep) 收集器是一种以获取最短回收停顿时间�
 
 ![img](https://imgconvert.csdnimg.cn/aHR0cHM6Ly91c2VyLWdvbGQtY2RuLnhpdHUuaW8vMjAxNy85LzQvNDBhNTc1OTMxYjI1NGE4ZjQwYmI1NDNjMjRlOGZhZGY_aW1hZ2VWaWV3Mi8wL3cvMTI4MC9oLzk2MC9mb3JtYXQvd2VicC9pZ25vcmUtZXJyb3IvMQ)
 
+### 2.6 内存分配与回收策略
 
-2.6 内存分配与回收策略
-2.6.1 对象优先在 Eden 分配
+#### 2.6.1 对象优先在 Eden 分配
 
 对象主要分配在新生代的 Eden 区上，如果启动了本地线程分配缓冲区，将线程优先在 (TLAB) 上分配。少数情况会直接分配在老年代中。
 
@@ -307,27 +320,27 @@ CMS (Concurrent Mark Sweep) 收集器是一种以获取最短回收停顿时间�
 
 发生在老年代的垃圾回收动作，出现了 Major GC 经常会伴随至少一次 Minor GC(非绝对)。Major GC 的速度一般会比 Minor GC 慢十倍以上。
 
-2.6.2 大对象直接进入老年代
+#### 2.6.2 大对象直接进入老年代
 
-2.6.3 长期存活的对象将进入老年代
+#### 2.6.3 长期存活的对象将进入老年代
 
-2.6.4 动态对象年龄判定
+#### 2.6.4 动态对象年龄判定
 
-2.6.5 空间分配担保
+#### 2.6.5 空间分配担保
 
-3. Java 内存模型与线程
+## 3 Java 内存模型与线程
 
 ![img](https://imgconvert.csdnimg.cn/aHR0cHM6Ly91c2VyLWdvbGQtY2RuLnhpdHUuaW8vMjAxNy85LzQvMjBhOTk2ODc0NmFmYTJhZmRlNGIzNzE2YmFiZjU1Y2U_aW1hZ2VWaWV3Mi8wL3cvMTI4MC9oLzk2MC9mb3JtYXQvd2VicC9pZ25vcmUtZXJyb3IvMQ)
 
+### 3.1 Java 内存模型
 
-3.1 Java 内存模型
 屏蔽掉各种硬件和操作系统的内存访问差异。
 
 ![img](https://imgconvert.csdnimg.cn/aHR0cHM6Ly91c2VyLWdvbGQtY2RuLnhpdHUuaW8vMjAxNy85LzQvOGY5ODMzMGRjOGFmNGNlOGNmNTM5N2EwMTMzMDhlYzI_aW1hZ2VWaWV3Mi8wL3cvMTI4MC9oLzk2MC9mb3JtYXQvd2VicC9pZ25vcmUtZXJyb3IvMQ)
 
  
 
-3.1.1 主内存和工作内存之间的交互
+#### 3.1.1 主内存和工作内存之间的交互
 
 操作	作用对象	解释
 lock	主内存	把一个变量标识为一条线程独占的状态
@@ -340,7 +353,8 @@ assign	工作内存	把一个从执行引擎接收到的值赋接收到的值赋
 每当虚拟机遇到一个给变量赋值的字节码指令时执行这个操作
 store	工作内存	把工作内存中的一个变量的值传送到主内存中，以便 write 操作
 write	工作内存	把 store 操作从工作内存中得到的变量的值放入主内存的变量中
-3.1.2 对于 volatile 型变量的特殊规则
+
+#### 3.1.2 对于 volatile 型变量的特殊规则
 
 关键字 volatile 是 Java 虚拟机提供的最轻量级的同步机制。
 
@@ -352,11 +366,11 @@ write	工作内存	把 store 操作从工作内存中得到的变量的值放入
 禁止指令重排序优化。
 通过插入内存屏障保证一致性。
 
-3.1.3 对于 long 和 double 型变量的特殊规则
+#### 3.1.3 对于 long 和 double 型变量的特殊规则
 
 Java 要求对于主内存和工作内存之间的八个操作都是原子性的，但是对于 64 位的数据类型，有一条宽松的规定：允许虚拟机将没有被 volatile 修饰的 64 位数据的读写操作划分为两次 32 位的操作来进行，即允许虚拟机实现选择可以不保证 64 位数据类型的 load、store、read 和 write 这 4 个操作的原子性。这就是 long 和 double 的非原子性协定。
 
-3.1.4 原子性、可见性与有序性
+#### 3.1.4 原子性、可见性与有序性
 
 回顾下并发下应该注意操作的那些特性是什么，同时加深理解。
 
@@ -369,7 +383,7 @@ Java 要求对于主内存和工作内存之间的八个操作都是原子性的
 有序性(Ordering)
 如果在被线程内观察，所有操作都是有序的；如果在一个线程中观察另一个线程，所有操作都是无序的。前半句指“线程内表现为串行的语义”，后半句是指“指令重排”现象和“工作内存与主内存同步延迟”现象。Java 语言通过 volatile 和 synchronize 两个关键字来保证线程之间操作的有序性。volatile 自身就禁止指令重排，而 synchronize 则是由“一个变量在同一时刻指允许一条线程对其进行 lock 操作”这条规则获得，这条规则决定了持有同一个锁的两个同步块只能串行的进入。
 
-3.1.5 先行发生原则
+#### 3.1.5 先行发生原则
 
 也就是 happens-before 原则。这个原则是判断数据是否存在竞争、线程是否安全的主要依据。先行发生是 Java 内存模型中定义的两项操作之间的偏序关系。
 
@@ -386,8 +400,10 @@ volatile 变量规则	volatile 变量的写操作先行发生于后面对这个�
 (通过 Thread.interrupted() 方法检测)
 对象终结规则	一个对象的初始化完成(构造函数执行结束)先行发生于它的 finalize() 方法的开始
 传递性	如果操作 A 先于 操作 B 发生，操作 B 先于 操作 C 发生，那么操作 A 先于 操作 C
-3.2 Java 与线程
-3.2.1 线程的实现
+
+### 3.2 Java 与线程
+
+#### 3.2.1 线程的实现
 
 使用内核线程实现
 
@@ -415,7 +431,7 @@ Java 线程实现
 
 平台不同实现方式不同，可以认为是一条 Java 线程映射到一条轻量级进程。
 
-3.2.2 Java 线程调度
+#### 3.2.2 Java 线程调度
 
 协同式线程调度
 
@@ -425,7 +441,7 @@ Java 线程实现
 
 每个线程由系统来分配执行时间。
 
-3.2.3 状态转换
+#### 3.2.3 状态转换
 
 五种状态：
 
@@ -463,10 +479,12 @@ Runable 包括了操作系统线程状态中的 Running 和 Ready，也就是出
 
  
 
-4. 线程安全与锁优化
+## 4 线程安全与锁优化
+
 // 待填
 
-5. 类文件结构
+## 5 类文件结构
+
 // 待填
 
 有点懒了。。。先贴几个网址吧。
@@ -479,7 +497,8 @@ Runable 包括了操作系统线程状态中的 Running 和 Ready，也就是出
 
 在 Java 语言中，类型的加载、连接和初始化过程都是在程序运行期间完成的。
 
-6.1 类加载时机
+### 6.1 类加载时机
+
 类的生命周期( 7 个阶段)
 
 ![img](https://imgconvert.csdnimg.cn/aHR0cHM6Ly91c2VyLWdvbGQtY2RuLnhpdHUuaW8vMjAxNy85LzQvMjdhYzg3ZjQzOTJmMGFiOTllNGM2NWMyM2NjNzE5NDU_aW1hZ2VWaWV3Mi8wL3cvMTI4MC9oLzk2MC9mb3JtYXQvd2VicC9pZ25vcmUtZXJyb3IvMQ)
@@ -548,9 +567,9 @@ public class NotInitialization {
 }
 ```
 
-6.2 类的加载过程
+### 6.2 类的加载过程
 
-6.2.1 加载
+#### 6.2.1 加载
 
 通过一个类的全限定名来获取定义次类的二进制流(ZIP 包、网络、运算生成、JSP 生成、数据库读取)。
 将这个字节流所代表的静态存储结构转化为方法区的运行时数据结构。
@@ -563,7 +582,7 @@ public class NotInitialization {
 内存中实例的 java.lang.Class 对象存在方法区中。作为程序访问方法区中这些类型数据的外部接口。
 加载阶段与连接阶段的部分内容是交叉进行的，但是开始时间保持先后顺序。
 
-6.2.2 验证
+#### 6.2.2 验证
 
 是连接的第一步，确保 Class 文件的字节流中包含的信息符合当前虚拟机要求。
 
@@ -603,7 +622,7 @@ Class 文件中各个部分集文件本身是否有被删除的附加的其他�
 最后一个阶段的校验发生在迅疾将符号引用转化为直接引用的时候，这个转化动作将在连接的第三阶段——解析阶段中发生。符号引用验证可以看做是对类自身以外（常量池中的各种符号引用）的信息进行匹配性校验，还有以上提及的内容。
 符号引用的目的是确保解析动作能正常执行，如果无法通过符号引用验证将抛出一个 java.lang.IncompatibleClass.ChangeError 异常的子类。如 java.lang.IllegalAccessError、java.lang.NoSuchFieldError、java.lang.NoSuchMethodError 等。
 
-6.2.3 准备
+#### 6.2.3 准备
 
 这个阶段正式为类分配内存并设置类变量初始值，内存在方法去中分配(含 static 修饰的变量不含实例变量)。
 
@@ -623,7 +642,7 @@ public static int value = 1127;
 
 特殊情况：如果类字段的字段属性表中存在 ConstantValue 属性，在准备阶段虚拟机就会根据 ConstantValue 的设置将 value 赋值为 1127。
 
-6.2.4 解析
+#### 6.2.4 解析
 
 这个阶段是虚拟机将常量池内的符号引用替换为直接引用的过程。
 
@@ -634,15 +653,15 @@ public static int value = 1127;
 
 解析动作主要针对类或接口、字段、类方法、接口方法、方法类型、方法句柄和调用点限定符 7 类符号引用进行，分别对应于常量池的 7 中常量类型。
 
-6.2.5 初始化
+#### 6.2.5 初始化
 
 前面过程都是以虚拟机主导，而初始化阶段开始执行类中的 Java 代码。
 
-6.3 类加载器
+#### 6.3 类加载器
 
 通过一个类的全限定名来获取描述此类的二进制字节流。
 
-6.3.1 双亲委派模型
+#### 6.3.1 双亲委派模型
 
 从 Java 虚拟机角度讲，只存在两种类加载器：一种是启动类加载器（C++ 实现，是虚拟机的一部分）；另一种是其他所有类的加载器（Java 实现，独立于虚拟机外部且全继承自 java.lang.ClassLoader）
 
@@ -662,7 +681,7 @@ ClassLoader负责，加载用户路径上所指定的类库。
 除顶层启动类加载器之外，其他都有自己的父类加载器。
 工作过程：如果一个类加载器收到一个类加载的请求，它首先不会自己加载，而是把这个请求委派给父类加载器。只有父类无法完成时子类才会尝试加载。
 
-6.3.2 破坏双亲委派模型
+#### 6.3.2 破坏双亲委派模型
 
 keyword：线程上下文加载器(Thread Context ClassLoader)
 
